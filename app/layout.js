@@ -1,5 +1,8 @@
+"use client"
 import './globals.css'
 import { Inter } from 'next/font/google'
+import { useState, useEffect } from 'react';
+
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -9,9 +12,44 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }) {
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setDarkMode(savedTheme === 'dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+      <div className={`bg-${darkMode ? 'gray-900' : 'white'} text-${darkMode ? 'white' : 'black'}`}>
+      <header className="p-4">
+        <button
+          onClick={toggleDarkMode}
+          className="bg-gray-300 dark:bg-gray-700 px-4 py-2 rounded-lg"
+        >
+          {darkMode ? 'Light Mode ☀️' : 'Dark Mode 🌚'}
+        </button>
+      </header>
+      <main className="p-4">{children}</main>
+    </div>
+      </body>
     </html>
   )
 }
